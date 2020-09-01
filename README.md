@@ -9,4 +9,8 @@ RESTful API with hypermedia-driven support for CRUD calls that generates data fo
 
 ## Endpoints
 
-- "/
+- "/shapes/new" to generate and get a new set of 50 randomly sized circles and 50 randomly sized squares
+- "/shapes/all" to get the most recently generated set of shapes in increasing order of ID
+- "/shapes/sorted" to get the most recently generated set of shapes by decreasing order of area
+- "/shapes/{id}" to get a single shape by its ID
+- "/shapes/meanArea" to get the shape(s) with area closest to the mean of the most recently generated set of 100 shapes
