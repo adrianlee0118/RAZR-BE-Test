@@ -6,7 +6,6 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -74,7 +73,7 @@ public class ShapeController {
     @GetMapping("/shapes/meanArea")
     CollectionModel<EntityModel<Shape>> getMeanAreaShapes(){
         HashMap<Integer, List<Shape>> diffShapes = new HashMap<Integer, List<Shape>>();
-        int minDiff = 100;
+        int minDiff = 10000;
         for (Shape shape : this.shapeRepository.findAll()){
             int diff = Math.abs(this.meanArea - shape.getArea());
             List<Shape> group = (diffShapes.get(diff) != null)? diffShapes.get(diff) : new ArrayList<Shape>();
