@@ -3,6 +3,8 @@ package com.example.RAZRBETest.Controllers;
 import com.example.RAZRBETest.Domain.Shape;
 import com.example.RAZRBETest.Repositories.ShapeRepository;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -19,19 +21,19 @@ import org.springframework.hateoas.EntityModel;
 public class ShapeController {
 
     private final ShapeRepository shapeRepository;
+    private final ShapeModelAssembler assembler;
     private int meanArea;
 
-    public ShapeController(ShapeRepository shapeRepository) {
+    public ShapeController(ShapeRepository shapeRepository, ShapeModelAssembler assembler) {
         this.shapeRepository = shapeRepository;
+        this.assembler = assembler;
     }
 
     //Gets existing list of shapes with links to various items and the full list
     @GetMapping("/shapes/all")
     CollectionModel<EntityModel<Shape>> all() {
         List<EntityModel<Shape>> shapes = StreamSupport.stream(shapeRepository.findAll().spliterator(),false)
-                .map(shape -> EntityModel.of(shape,
-                        linkTo(methodOn(ShapeController.class).one(shape.getId())).withSelfRel(),
-                        linkTo(methodOn(ShapeController.class).all()).withRel("shapes/all")))
+                .map(assembler::toModel)
                 .collect(Collectors.toList());
         return CollectionModel.of(shapes, linkTo(methodOn(ShapeController.class).all()).withSelfRel());
     }
@@ -61,9 +63,7 @@ public class ShapeController {
     @GetMapping("/shapes/sorted")
     CollectionModel<EntityModel<Shape>> sort() {
         List<EntityModel<Shape>> shapes = StreamSupport.stream(shapeRepository.findAll().spliterator(),false)
-                .map(shape -> EntityModel.of(shape,
-                        linkTo(methodOn(ShapeController.class).one(shape.getId())).withSelfRel(),
-                        linkTo(methodOn(ShapeController.class).all()).withRel("shapes/all")))
+                .map(assembler::toModel)
                 .sorted((shape1, shape2) -> shape2.getContent().getArea() - shape1.getContent().getArea())
                 .collect(Collectors.toList());
         return CollectionModel.of(shapes, linkTo(methodOn(ShapeController.class).all()).withSelfRel());
@@ -82,9 +82,7 @@ public class ShapeController {
             if (diff < minDiff) minDiff = diff;
         }
         List<EntityModel<Shape>> ans = new ArrayList<EntityModel<Shape>>();
-        diffShapes.get(minDiff).forEach(shape -> ans.add(EntityModel.of(shape,
-                linkTo(methodOn(ShapeController.class).one(shape.getId())).withSelfRel(),
-                linkTo(methodOn(ShapeController.class).all()).withRel("shapes/all"))));
+        diffShapes.get(minDiff).forEach(shape -> ans.add(assembler.toModel(shape)));
         return CollectionModel.of(ans, linkTo(methodOn(ShapeController.class).all()).withSelfRel());
     }
 
@@ -93,22 +91,20 @@ public class ShapeController {
     EntityModel<Shape> one(@PathVariable Long id) {
         Shape shape = shapeRepository.findById(id)
                 .orElseThrow(() -> new ShapeNotFoundException(id));
-
-        return EntityModel.of(shape,
-                linkTo(methodOn(ShapeController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(ShapeController.class).all()).withRel("shapes/all")
-        );
+        return assembler.toModel(shape);
     }
 
     //Add a shape
     @PostMapping("/shapes")
-    Shape newShape(@RequestBody Shape newShape) {
-        return shapeRepository.save(newShape);
+    ResponseEntity<?> newShape(@RequestBody Shape newShape) {
+        EntityModel<Shape> entityModel = assembler.toModel(shapeRepository.save(newShape));
+        return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
 
     //Delete shapes by Id
     @DeleteMapping("/shapes/{id}")
-    void deleteShape(@PathVariable Long id) {
+    ResponseEntity<?> deleteShape(@PathVariable Long id) {
         shapeRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
