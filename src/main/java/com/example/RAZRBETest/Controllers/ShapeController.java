@@ -101,6 +101,29 @@ public class ShapeController {
         return ResponseEntity.created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(entityModel);
     }
 
+    //Update a shape of a certain ID if it exists, otherwise create a new shape with the passed ID
+    @PutMapping("/shapes/{id}")
+    ResponseEntity<?> replaceShape(@RequestBody Shape newShape, @PathVariable Long id) {
+
+        Shape updatedShape = shapeRepository.findById(id)
+                .map(shape -> {
+                    shape.setType(newShape.getType());
+                    shape.setCrossDim(newShape.getCrossDim());
+                    shape.setArea(newShape.getArea());
+                    return shapeRepository.save(shape);
+                })
+                .orElseGet(() -> {
+                    newShape.setId(id);
+                    return shapeRepository.save(newShape);
+                });
+
+        EntityModel<Shape> entityModel = assembler.toModel(updatedShape);
+
+        return ResponseEntity
+                .created(entityModel.getRequiredLink(IanaLinkRelations.SELF).toUri()) //
+                .body(entityModel);
+    }
+
     //Delete shapes by Id
     @DeleteMapping("/shapes/{id}")
     ResponseEntity<?> deleteShape(@PathVariable Long id) {

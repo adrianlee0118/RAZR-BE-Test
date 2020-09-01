@@ -38,6 +38,22 @@ public class Shape {
         return area;
     }
 
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setCrossDim(int crossDim) {
+        this.crossDim = crossDim;
+    }
+
+    public void setArea(int area) {
+        this.area = area;
+    }
+
     @Override
     public String toString(){
         return type+": "+(type == "Circle"? "Radius = "+Integer.toString(crossDim/2) : "Size = "+Integer.toString(crossDim))+", Area: "+area;
