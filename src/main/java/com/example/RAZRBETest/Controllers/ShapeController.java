@@ -94,7 +94,7 @@ public class ShapeController {
         return assembler.toModel(shape);
     }
 
-    //Add a shape
+    //Add a shape - ResponseEntity wrapper creates "HTTP 201 Created" status message
     @PostMapping("/shapes")
     ResponseEntity<?> newShape(@RequestBody Shape newShape) {
         EntityModel<Shape> entityModel = assembler.toModel(shapeRepository.save(newShape));
