@@ -1,5 +1,5 @@
 ## About
-RESTful API with hypermedia-driven support for CRUD calls that generates data for creating randomly-sized squares and circles written in Java (Spring-Boot)
+RESTf API with hypermedia-driven support for CRUD calls that generates data for creating randomly-sized squares and circles written in Java (Spring-Boot)
 
 ## Install
 
