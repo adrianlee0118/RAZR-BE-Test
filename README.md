@@ -1,5 +1,5 @@
 ## About
-RESTf API with hypermedia-driven support for CRUD calls that generates data for creating randomly-sized squares and circles written in Java (Spring-Boot)
+RESTf API written in Spring-Boot with hypermedia-driven support for CRUD calls that generates data for creating randomly-sized squares and circles
 
 
 ![Demo](https://github.com/adrianlee0118/RAZR-BE-Test/blob/master/assets/demo.gif)
